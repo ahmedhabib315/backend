@@ -5,6 +5,13 @@ import shortUrlRouter from './routes/short-url';
 import shorty from './routes/shorty';
 const app: Express = express();
 import bodyParser from 'body-parser';
+import cors from 'cors';
+
+const corsConfig = {
+  credentials: true,
+  origin: true,
+};
+app.use(cors(corsConfig));
 
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -15,7 +22,7 @@ dotenv.config();
 
 connectToMongo();
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 const host = process.env.HOST;
 
 app.use('/short-url', shortUrlRouter);

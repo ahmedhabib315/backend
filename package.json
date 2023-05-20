@@ -19,6 +19,7 @@
     "url": "https://github.com/ahmedhabib315/backend/issues"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.13",
     "@types/express": "4.17.17",
     "@types/node": "20.2.1",
     "typescript": "5.0.4"
