@@ -27,7 +27,7 @@ export const checkUrl = (req: Request, res: Response, next: NextFunction) => {
 
 export const fetchUser = async (req: any, res: Response, next: NextFunction) => {
   //Get Token From the Header
-  const token = req.body.authToken;
+  const token = req.body.authToken || req.headers.authtoken;
 
   //If Token is not available then throw error
   if (!token) {
@@ -39,8 +39,6 @@ export const fetchUser = async (req: any, res: Response, next: NextFunction) => 
   try {
     //Verify If Token is ours and send it in request to verify
     const data: any = await jwt.verify(token, JWT_SECRET);
-
-    console.log('::fetchUser data::', data);
 
     req.user = data.user;
     next();
