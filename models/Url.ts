@@ -6,10 +6,10 @@ const urlSchema = new Schema({
 		type: String,
 		required: true,
 	},
-	userId: {
-		type: [String],
-		required: true,
-	},
+	userId: [{
+		type: Schema.Types.ObjectId,
+		ref: 'User'
+	}],
 	origUrl: {
 		type: String,
 		required: true
@@ -34,11 +34,7 @@ const urlSchema = new Schema({
 		type: Number,
 		required: true,
 		default: 0,
-	},
-	description: {
-		type: String,
-		required: true,
-	},
+	}
 });
 
 export const Url = mongoose.model("url", urlSchema);

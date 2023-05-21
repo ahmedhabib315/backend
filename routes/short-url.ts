@@ -1,4 +1,5 @@
-import { checkUrl } from "../middleware/check-url";
+import { API_URL_PREFIX } from "../constants/constants";
+import { checkUrl, fetchUser } from "../middleware/middleware";
 import { Url } from "../models/Url";
 import express, { Request, Response } from 'express';
 import { nanoid } from 'nanoid'
@@ -6,19 +7,19 @@ const router = express.Router();
 
 const base = process.env.BASE;
 
-
-router.post('/', checkUrl, async (req: Request, res: Response) => {
-	const { url, description } = req.body;
+router.post('/', fetchUser, checkUrl, async (req: any, res: Response) => {
+	const { url } = req.body;
+	const userId = req.user.id;
 	const urlId = nanoid();
 	try {
 		const filter = { origUrl: url };
 		const urlData = await Url.findOne(filter).select("-userId");
 		if (!urlData) {
-			const shortUrl = `${base}/${urlId}`;
-			const newUrlData = await Url.create({
+			const shortUrl = `${API_URL_PREFIX}/${urlId}`;
+			const newUrlData: any = await Url.create({
 				urlId,
 				origUrl: url,
-				description: description,
+				userId: [userId],
 				shortUrl,
 				createdAt: new Date(),
 				lastUpdatedAt: new Date(),
@@ -26,13 +27,34 @@ router.post('/', checkUrl, async (req: Request, res: Response) => {
 			});
 
 			return res
-				.json(newUrlData);
+				.json({...newUrlData._doc, shortUrl: base + newUrlData.shortUrl});
 		}
 		else {
-			const updatedUrlData = await Url.findOneAndUpdate(filter, { $inc: { timesCreated: 1 }, lastUpdatedAt: new Date(), }, { new: true });
-			return res
-				.json(updatedUrlData);
+			const updatedUrlData: any = await Url.findOneAndUpdate(filter, { $inc: { timesCreated: 1 }, lastUpdatedAt: new Date(), $addToSet: { userId: userId } }, { new: true });
+			if(updatedUrlData){
+				return res
+				.json({...updatedUrlData._doc, shortUrl: base + updatedUrlData.shortUrl});
+			}
 		}
+	} catch (error: any) {
+		console.error(error.message);
+		res.status(500).send("Some Internal Error Occured");
+	}
+});
+
+router.get('/', fetchUser, async (req: any, res: Response) => {
+	const userId = req.user.id;
+	const urls: any = [];
+	try {
+		const userUrlData = await Url.find({ userId: userId }).select("-userId");
+		userUrlData.forEach(function getUrls(data) {
+			urls.push({
+				origUrl: data.origUrl,
+				shortUrl: base + data.shortUrl
+			});
+		});
+
+		res.json(urls);
 	} catch (error: any) {
 		console.error(error.message);
 		res.status(500).send("Some Internal Error Occured");
