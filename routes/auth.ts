@@ -64,7 +64,7 @@ router.post(
       const authToken = await jwt.sign(payload, JWT_SECRET);
       success = true;
 
-      res.json({ success: success, user_token: authToken, authToken: authToken, name: name, email: email, user_id: 1 });
+      res.json({ success: success, authToken: authToken, name: name, email: email, user_id: 1 });
     } catch (err: any) {
       console.error(err.message);
       res.status(500).send("Some Internal Error Occured");
