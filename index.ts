@@ -4,6 +4,7 @@ import { connectToMongo } from "./db/db";
 import shortUrlRouter from './routes/short-url';
 import authRouter from './routes/auth';
 import shortyRouter from './routes/shorty';
+import expenseRouter from './routes/expense';
 const app: Express = express();
 import bodyParser from 'body-parser';
 import cors from 'cors';
@@ -30,6 +31,7 @@ const host = process.env.HOST;
 
 app.use('/short-url', shortUrlRouter);
 app.use('/shorty', shortyRouter);
+app.use('/expense', expenseRouter);
 app.use('/', authRouter);
 
 
